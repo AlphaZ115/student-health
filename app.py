@@ -215,6 +215,31 @@ def height_comparison():
     return render_template("height_comparison.html", stats=stats)
 
 
+# ---------- WEIGHT COMPARISON ----------
+@app.route("/analysis/weight")
+def weight_comparison():
+    conn = get_db()
+    query = """
+        WITH LatestRecords AS (
+            SELECT MaHS, MAX(NgayKham) AS LatestDate
+            FROM SucKhoe
+            GROUP BY MaHS
+        )
+        SELECT Lop,
+               AVG(SucKhoe.CanNang) AS NangTB,
+               COUNT(DISTINCT HocSinh.MaHS) AS SoHocSinh
+        FROM SucKhoe
+        JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
+        JOIN LatestRecords ON SucKhoe.MaHS = LatestRecords.MaHS 
+                          AND SucKhoe.NgayKham = LatestRecords.LatestDate
+        GROUP BY Lop
+        ORDER BY Lop
+    """
+    stats = conn.execute(query).fetchall()
+    conn.close()
+    return render_template("weight_comparison.html", stats=stats)
+
+
 # ---------- RUN ----------
 if __name__ == "__main__":
     init_db()
