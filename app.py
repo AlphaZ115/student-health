@@ -129,6 +129,42 @@ def add_health_record(student_id):
     return render_template("add_health_record.html", student=student)
 
 
+# ---------- DELETE HEALTH RECORD ----------
+@app.route("/health/delete/<int:record_id>/<int:student_id>")
+def delete_health_record(record_id, student_id):
+    conn = get_db()
+    conn.execute("DELETE FROM SucKhoe WHERE MaSK=?", (record_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("health_records", student_id=student_id))
+
+
+# ---------- EDIT HEALTH RECORD ----------
+@app.route("/health/edit/<int:record_id>/<int:student_id>", methods=["GET", "POST"])
+def edit_health_record(record_id, student_id):
+    conn = get_db()
+
+    if request.method == "POST":
+        chieucao = float(request.form["ChieuCao"])
+        cannang = float(request.form["CanNang"])
+        ngaykham = request.form["NgayKham"]
+
+        conn.execute(
+            "UPDATE SucKhoe SET ChieuCao=?, CanNang=?, NgayKham=? WHERE MaSK=?",
+            (chieucao, cannang, ngaykham, record_id),
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for("health_records", student_id=student_id))
+
+    student = conn.execute(
+        "SELECT * FROM HocSinh WHERE MaHS=?", (student_id,)
+    ).fetchone()
+    record = conn.execute("SELECT * FROM SucKhoe WHERE MaSK=?", (record_id,)).fetchone()
+    conn.close()
+    return render_template("edit_health_record.html", student=student, record=record)
+
+
 # ---------- BMI ANALYSIS ----------
 @app.route("/analysis/bmi")
 def bmi_analysis():
@@ -177,17 +213,54 @@ def bmi_analysis():
 # ---------- MONTHLY STATISTICS ----------
 @app.route("/analysis/monthly")
 def monthly_stats():
+    show_students = request.args.get("show_students", "false") == "true"
     conn = get_db()
-    query = """
-        SELECT strftime('%Y-%m', NgayKham) AS Thang,
-               COUNT(*) AS SoLan
-        FROM SucKhoe
-        GROUP BY Thang
-        ORDER BY Thang DESC
-    """
+
+    if show_students:
+        query = """
+            SELECT Thang, SoLan, GROUP_CONCAT(student_data, '|||') AS StudentData
+            FROM (
+                SELECT strftime('%Y-%m', SucKhoe.NgayKham) AS Thang,
+                       COUNT(*) OVER (PARTITION BY strftime('%Y-%m', SucKhoe.NgayKham)) AS SoLan,
+                       HocSinh.MaHS || '::' || HocSinh.TenHS AS student_data
+                FROM SucKhoe
+                JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
+                GROUP BY strftime('%Y-%m', SucKhoe.NgayKham), HocSinh.MaHS
+            )
+            GROUP BY Thang
+            ORDER BY Thang DESC
+        """
+    else:
+        query = """
+            SELECT strftime('%Y-%m', NgayKham) AS Thang,
+                   COUNT(*) AS SoLan
+            FROM SucKhoe
+            GROUP BY Thang
+            ORDER BY Thang DESC
+        """
+
     stats = conn.execute(query).fetchall()
     conn.close()
-    return render_template("monthly_stats.html", stats=stats)
+
+    # Parse student data if needed
+    if show_students:
+        parsed_stats = []
+        for row in stats:
+            parsed_row = dict(row)
+            if row["StudentData"]:
+                students = []
+                for student_data in row["StudentData"].split("|||"):
+                    ma_hs, ten_hs = student_data.split("::")
+                    students.append({"MaHS": ma_hs, "TenHS": ten_hs})
+                parsed_row["Students"] = students
+            else:
+                parsed_row["Students"] = []
+            parsed_stats.append(parsed_row)
+        stats = parsed_stats
+
+    return render_template(
+        "monthly_stats.html", stats=stats, show_students=show_students
+    )
 
 
 # ---------- HEIGHT COMPARISON ----------
