@@ -133,18 +133,45 @@ def add_health_record(student_id):
 @app.route("/analysis/bmi")
 def bmi_analysis():
     conn = get_db()
-    query = """
-        SELECT HocSinh.MaHS, HocSinh.TenHS, HocSinh.Lop,
-               SucKhoe.ChieuCao, SucKhoe.CanNang, SucKhoe.NgayKham,
-               (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) AS BMI
-        FROM SucKhoe
-        JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
-        WHERE BMI < 18.5 OR BMI > 25
-        ORDER BY BMI
-    """
+    show_all = request.args.get("show_all", "false") == "true"
+
+    if show_all:
+        # Show all abnormal BMI records
+        query = """
+            SELECT HocSinh.MaHS, HocSinh.TenHS, HocSinh.Lop,
+                   SucKhoe.ChieuCao, SucKhoe.CanNang, SucKhoe.NgayKham,
+                   (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) AS BMI
+            FROM SucKhoe
+            JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
+            WHERE (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) < 18.5 
+               OR (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) > 25
+            ORDER BY BMI
+        """
+    else:
+        # Show only latest abnormal BMI record for each student
+        query = """
+            WITH LatestRecords AS (
+                SELECT MaHS, MAX(NgayKham) AS LatestDate
+                FROM SucKhoe
+                GROUP BY MaHS
+            )
+            SELECT HocSinh.MaHS, HocSinh.TenHS, HocSinh.Lop,
+                   SucKhoe.ChieuCao, SucKhoe.CanNang, SucKhoe.NgayKham,
+                   (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) AS BMI
+            FROM SucKhoe
+            JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
+            JOIN LatestRecords ON SucKhoe.MaHS = LatestRecords.MaHS 
+                              AND SucKhoe.NgayKham = LatestRecords.LatestDate
+            WHERE (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) < 18.5 
+               OR (SucKhoe.CanNang / (SucKhoe.ChieuCao * SucKhoe.ChieuCao)) > 25
+            ORDER BY BMI
+        """
+
     abnormal_records = conn.execute(query).fetchall()
     conn.close()
-    return render_template("bmi_analysis.html", records=abnormal_records)
+    return render_template(
+        "bmi_analysis.html", records=abnormal_records, show_all=show_all
+    )
 
 
 # ---------- MONTHLY STATISTICS ----------
@@ -168,11 +195,18 @@ def monthly_stats():
 def height_comparison():
     conn = get_db()
     query = """
+        WITH LatestRecords AS (
+            SELECT MaHS, MAX(NgayKham) AS LatestDate
+            FROM SucKhoe
+            GROUP BY MaHS
+        )
         SELECT Lop,
-               AVG(ChieuCao) AS CaoTB,
+               AVG(SucKhoe.ChieuCao) AS CaoTB,
                COUNT(DISTINCT HocSinh.MaHS) AS SoHocSinh
         FROM SucKhoe
         JOIN HocSinh ON SucKhoe.MaHS = HocSinh.MaHS
+        JOIN LatestRecords ON SucKhoe.MaHS = LatestRecords.MaHS 
+                          AND SucKhoe.NgayKham = LatestRecords.LatestDate
         GROUP BY Lop
         ORDER BY Lop
     """
