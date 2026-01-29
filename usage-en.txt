@@ -1,0 +1,121 @@
+================================================================================
+    USER GUIDE - STUDENT HEALTH TRACKING SYSTEM
+================================================================================
+
+1. INSTALLATION AND RUNNING THE APPLICATION
+--------------------------------------------------------------------------------
+Step 1: Install Python (version 3.7 or higher)
+
+Step 2: Install Flask
+    pip install flask
+
+Step 3: Run the application
+    python app.py
+
+Step 4: Open a web browser and navigate to
+    http://127.0.0.1:5000
+
+
+2. STUDENT MANAGEMENT
+--------------------------------------------------------------------------------
+2.1. View student list
+    - Click "Students" in the navigation bar
+    - List displays: Student ID, Name, Class, Birth Date
+
+2.2. Add new student
+    - Click "+ Add Student" button (top right corner)
+    - Fill in information: Name, Class, Birth Date
+    - Click "Save Student"
+
+2.3. Edit student information
+    - In the student list, click the yellow "Edit" button
+    - Update the necessary information
+    - Click "Update Student"
+
+2.4. Delete student
+    - In the student list, click the red "Delete" button
+    - Confirm deletion
+
+
+3. HEALTH RECORD MANAGEMENT
+--------------------------------------------------------------------------------
+3.1. View student health records
+    - In the student list, click "Health Records" button
+    - Displays check-up history: Date, Height, Weight, BMI, Status
+
+3.2. Add health record
+    - Go to a student's health records page
+    - Click "+ Add Health Record"
+    - Enter: Height (meters), Weight (kg), Check Date
+    - Click "Save Record"
+
+    Note: Instructions for adding health records are displayed on the student list page
+
+3.3. Edit health record
+    - In the health records page, click the yellow "Edit" button
+    - Update the information
+    - Click "Update Record"
+
+3.4. Delete health record
+    - In the health records page, click the red "Delete" button
+    - Confirm deletion
+
+
+4. HEALTH ANALYSIS
+--------------------------------------------------------------------------------
+4.1. BMI Analysis - Abnormal Cases
+    - Click "Analysis" → "BMI Warnings"
+    - View list of students with abnormal BMI
+        • BMI < 18.5: Underweight
+        • BMI > 25: Overweight
+    
+    Options:
+    - ☐ Show all abnormal records: Display all abnormal records
+    - ☑ Show all abnormal records: Display only the latest record per student
+
+4.2. Monthly Statistics
+    - Click "Analysis" → "Monthly Stats"
+    - View number of health checkups per month
+    
+    Options:
+    - ☑ Show students who were checked each month: Display list of checked students
+      (click on a name to view that student's health records)
+
+4.3. Average Height Comparison by Class
+    - Click "Analysis" → "Height Comparison"
+    - View average height and number of students per class
+    - Data calculated based on the latest record for each student
+
+4.4. Average Weight Comparison by Class
+    - Click "Analysis" → "Weight Comparison"
+    - View average weight and number of students per class
+    - Data calculated based on the latest record for each student
+
+
+5. IMPORTANT NOTES
+--------------------------------------------------------------------------------
+- Database is stored in "health.db" file
+- This file is automatically created when running the application for the first time
+- Height is entered in meters (e.g., 1.65 for 165cm)
+- Weight is entered in kilograms (e.g., 55.5)
+- Dates use the format YYYY-MM-DD
+- Each student can have multiple health records over time
+- BMI is calculated automatically: BMI = Weight / (Height)²
+
+
+6. DATABASE STRUCTURE
+--------------------------------------------------------------------------------
+HocSinh (Students) Table:
+    - MaHS: Student ID (auto-generated)
+    - TenHS: Student name
+    - Lop: Class
+    - NgaySinh: Birth date
+
+SucKhoe (Health) Table:
+    - MaSK: Record ID (auto-generated)
+    - MaHS: Student ID (links to HocSinh)
+    - ChieuCao: Height (meters)
+    - CanNang: Weight (kg)
+    - NgayKham: Check date
+
+================================================================================

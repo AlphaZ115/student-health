@@ -1,0 +1,121 @@
+================================================================================
+    HƯỚNG DẪN SỬ DỤNG - HỆ THỐNG THEO DÕI SỨC KHỎE HỌC SINH
+================================================================================
+
+1. CÀI ĐẶT VÀ CHẠY ỨNG DỤNG
+--------------------------------------------------------------------------------
+Bước 1: Cài đặt Python (phiên bản 3.7 trở lên)
+
+Bước 2: Cài đặt Flask
+    pip install flask
+
+Bước 3: Chạy ứng dụng
+    python app.py
+
+Bước 4: Mở trình duyệt và truy cập
+    http://127.0.0.1:5000
+
+
+2. QUẢN LÝ HỌC SINH
+--------------------------------------------------------------------------------
+2.1. Xem danh sách học sinh
+    - Nhấp vào "Students" trên thanh điều hướng
+    - Danh sách hiển thị: Mã HS, Tên, Lớp, Ngày sinh
+
+2.2. Thêm học sinh mới
+    - Nhấp nút "+ Add Student" (góc trên bên phải)
+    - Điền thông tin: Tên, Lớp, Ngày sinh
+    - Nhấn "Save Student"
+
+2.3. Chỉnh sửa thông tin học sinh
+    - Tại danh sách học sinh, nhấn nút "Edit" màu vàng
+    - Cập nhật thông tin cần thiết
+    - Nhấn "Update Student"
+
+2.4. Xóa học sinh
+    - Tại danh sách học sinh, nhấn nút "Delete" màu đỏ
+    - Xác nhận xóa
+
+
+3. QUẢN LÝ HỒ SƠ SỨC KHỎE
+--------------------------------------------------------------------------------
+3.1. Xem hồ sơ sức khỏe của học sinh
+    - Tại danh sách học sinh, nhấn nút "Health Records"
+    - Hiển thị lịch sử khám: Ngày khám, Chiều cao, Cân nặng, BMI, Tình trạng
+
+3.2. Thêm bản ghi sức khỏe
+    - Vào trang hồ sơ sức khỏe của học sinh
+    - Nhấn "+ Add Health Record"
+    - Nhập: Chiều cao (mét), Cân nặng (kg), Ngày khám
+    - Nhấn "Save Record"
+
+    Lưu ý: Hướng dẫn thêm hồ sơ sức khỏe hiển thị trên trang danh sách học sinh
+
+3.3. Chỉnh sửa bản ghi sức khỏe
+    - Tại trang hồ sơ sức khỏe, nhấn nút "Edit" màu vàng
+    - Cập nhật thông tin
+    - Nhấn "Update Record"
+
+3.4. Xóa bản ghi sức khỏe
+    - Tại trang hồ sơ sức khỏe, nhấn nút "Delete" màu đỏ
+    - Xác nhận xóa
+
+
+4. PHÂN TÍCH SỨC KHỎE
+--------------------------------------------------------------------------------
+4.1. Phân tích BMI - Cảnh báo bất thường
+    - Nhấn "Analysis" → "BMI Warnings"
+    - Xem danh sách học sinh có BMI bất thường
+        • BMI < 18.5: Thiếu cân
+        • BMI > 25: Thừa cân
+    
+    Tùy chọn:
+    - ☐ Show all abnormal records: Hiển thị tất cả bản ghi bất thường
+    - ☑ Show all abnormal records: Chỉ hiển thị bản ghi mới nhất của mỗi học sinh
+
+4.2. Thống kê theo tháng
+    - Nhấn "Analysis" → "Monthly Stats"
+    - Xem số lần khám sức khỏe theo từng tháng
+    
+    Tùy chọn:
+    - ☑ Show students who were checked each month: Hiển thị danh sách học sinh
+      được khám (nhấn vào tên để xem hồ sơ sức khỏe của học sinh đó)
+
+4.3. So sánh chiều cao trung bình theo lớp
+    - Nhấn "Analysis" → "Height Comparison"
+    - Xem chiều cao trung bình và số lượng học sinh của mỗi lớp
+    - Dữ liệu tính dựa trên bản ghi mới nhất của mỗi học sinh
+
+4.4. So sánh cân nặng trung bình theo lớp
+    - Nhấn "Analysis" → "Weight Comparison"
+    - Xem cân nặng trung bình và số lượng học sinh của mỗi lớp
+    - Dữ liệu tính dựa trên bản ghi mới nhất của mỗi học sinh
+
+
+5. LƯU Ý QUAN TRỌNG
+--------------------------------------------------------------------------------
+- Cơ sở dữ liệu được lưu trong file "health.db"
+- File này được tự động tạo khi chạy ứng dụng lần đầu
+- Chiều cao nhập bằng mét (ví dụ: 1.65 cho 165cm)
+- Cân nặng nhập bằng kg (ví dụ: 55.5)
+- Ngày tháng sử dụng định dạng YYYY-MM-DD
+- Mỗi học sinh có thể có nhiều bản ghi sức khỏe theo thời gian
+- BMI được tính tự động: BMI = Cân nặng / (Chiều cao)²
+
+
+6. CẤU TRÚC CƠ SỞ DỮ LIỆU
+--------------------------------------------------------------------------------
+Bảng HocSinh (Học sinh):
+    - MaHS: Mã học sinh (tự động)
+    - TenHS: Tên học sinh
+    - Lop: Lớp
+    - NgaySinh: Ngày sinh
+
+Bảng SucKhoe (Sức khỏe):
+    - MaSK: Mã bản ghi (tự động)
+    - MaHS: Mã học sinh (liên kết với HocSinh)
+    - ChieuCao: Chiều cao (mét)
+    - CanNang: Cân nặng (kg)
+    - NgayKham: Ngày khám
+
+================================================================================
