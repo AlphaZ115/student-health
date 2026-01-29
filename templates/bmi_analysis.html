@@ -61,6 +61,10 @@
 <p class="text-muted">Total abnormal cases: {{ records|length }}{% if not show_all %} (latest records only){% endif %}
 </p>
 {% else %}
+{% if total_records == 0 %}
+<div class="alert alert-info">📋 No health records available yet. Add some health records to see BMI analysis.</div>
+{% else %}
 <div class="alert alert-success">✅ No abnormal BMI cases found!</div>
+{% endif %}
 {% endif %}
 {% endblock %}

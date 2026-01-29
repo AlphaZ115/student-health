@@ -204,9 +204,18 @@ def bmi_analysis():
         """
 
     abnormal_records = conn.execute(query).fetchall()
+
+    # Check if there are any health records at all
+    total_records = conn.execute("SELECT COUNT(*) as count FROM SucKhoe").fetchone()[
+        "count"
+    ]
+
     conn.close()
     return render_template(
-        "bmi_analysis.html", records=abnormal_records, show_all=show_all
+        "bmi_analysis.html",
+        records=abnormal_records,
+        show_all=show_all,
+        total_records=total_records,
     )
 
 
