@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-3">📏 Average Height Comparison by Class</h2>
+
+{% if stats %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Class</th>
+            <th>Average Height (m)</th>
+            <th>Number of Students</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in stats %}
+        <tr>
+            <td><strong>{{ s.Lop }}</strong></td>
+            <td>{{ "%.2f"|format(s.CaoTB) }} m</td>
+            <td><span class="badge bg-info">{{ s.SoHocSinh }} students</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h5>Overall Summary</h5>
+        {% set total_students = stats|sum(attribute='SoHocSinh') %}
+        {% set avg_all = stats|sum(attribute='CaoTB') / stats|length %}
+        <p><strong>Total classes:</strong> {{ stats|length }}</p>
+        <p><strong>Total students with records:</strong> {{ total_students }}</p>
+        <p><strong>Overall average height:</strong> {{ "%.2f"|format(avg_all) }} m</p>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">No data available for comparison.</div>
+{% endif %}
+{% endblock %}

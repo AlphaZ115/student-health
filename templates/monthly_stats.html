@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-3">📊 Monthly Health Check Statistics</h2>
+
+{% if stats %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Number of Checkups</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in stats %}
+        <tr>
+            <td>{{ s.Thang }}</td>
+            <td><span class="badge bg-primary">{{ s.SoLan }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h5>Summary</h5>
+        <p><strong>Total checkups:</strong> {{ stats|sum(attribute='SoLan') }}</p>
+        <p><strong>Months tracked:</strong> {{ stats|length }}</p>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">No health check records found.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Health Records - {{ student.TenHS }}</h2>
+    <div>
+        <a href="/health/add/{{ student.MaHS }}" class="btn btn-success">+ Add Health Record</a>
+        <a href="/students" class="btn btn-secondary">Back to Students</a>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <p><strong>Student ID:</strong> {{ student.MaHS }}</p>
+        <p><strong>Class:</strong> {{ student.Lop }}</p>
+        <p><strong>Birth Date:</strong> {{ student.NgaySinh }}</p>
+    </div>
+</div>
+
+<h3>Health Check History</h3>
+{% if records %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Height (m)</th>
+            <th>Weight (kg)</th>
+            <th>BMI</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in records %}
+        {% set bmi = r.CanNang / (r.ChieuCao * r.ChieuCao) %}
+        <tr>
+            <td>{{ r.NgayKham }}</td>
+            <td>{{ "%.2f"|format(r.ChieuCao) }}</td>
+            <td>{{ "%.1f"|format(r.CanNang) }}</td>
+            <td>{{ "%.1f"|format(bmi) }}</td>
+            <td>
+                {% if bmi < 18.5 %} <span class="badge bg-warning">Underweight</span>
+                    {% elif bmi > 25 %}
+                    <span class="badge bg-danger">Overweight</span>
+                    {% else %}
+                    <span class="badge bg-success">Normal</span>
+                    {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No health records yet. Click "Add Health Record" to add one.</div>
+{% endif %}
+{% endblock %}

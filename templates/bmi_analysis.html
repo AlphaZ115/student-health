@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-3">⚠️ BMI Analysis - Abnormal Cases</h2>
+
+<div class="alert alert-info">
+    <strong>BMI Categories:</strong>
+    <ul class="mb-0">
+        <li>Underweight: BMI &lt; 18.5</li>
+        <li>Normal: 18.5 ≤ BMI ≤ 25</li>
+        <li>Overweight: BMI &gt; 25</li>
+    </ul>
+</div>
+
+{% if records %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Class</th>
+            <th>Check Date</th>
+            <th>Height (m)</th>
+            <th>Weight (kg)</th>
+            <th>BMI</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in records %}
+        <tr>
+            <td><a href="/health/{{ r.MaHS }}">{{ r.TenHS }}</a></td>
+            <td>{{ r.Lop }}</td>
+            <td>{{ r.NgayKham }}</td>
+            <td>{{ "%.2f"|format(r.ChieuCao) }}</td>
+            <td>{{ "%.1f"|format(r.CanNang) }}</td>
+            <td><strong>{{ "%.1f"|format(r.BMI) }}</strong></td>
+            <td>
+                {% if r.BMI < 18.5 %} <span class="badge bg-warning">⚠️ Underweight</span>
+                    {% else %}
+                    <span class="badge bg-danger">⚠️ Overweight</span>
+                    {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p class="text-muted">Total abnormal cases: {{ records|length }}</p>
+{% else %}
+<div class="alert alert-success">✅ No abnormal BMI cases found!</div>
+{% endif %}
+{% endblock %}
