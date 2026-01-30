@@ -31,7 +31,11 @@
     <div class="card-body">
         <h5>Overall Summary</h5>
         {% set total_students = stats|sum(attribute='SoHocSinh') %}
-        {% set avg_all = stats|sum(attribute='CaoTB') / stats|length %}
+        {% set total_height = namespace(value=0) %}
+        {% for s in stats %}
+        {% set total_height.value = total_height.value + (s.CaoTB * s.SoHocSinh) %}
+        {% endfor %}
+        {% set avg_all = total_height.value / total_students %}
         <p><strong>Total classes:</strong> {{ stats|length }}</p>
         <p><strong>Total students with records:</strong> {{ total_students }}</p>
         <p><strong>Overall average height:</strong> {{ "%.2f"|format(avg_all) }} m</p>
